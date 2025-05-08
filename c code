@@ -1,0 +1,64 @@
+/*
+ * Author: Hussein Aboelfadl
+ * I confirm that the work submitted is my own.
+ *
+ * Program: bitconv.c
+ * Description:
+ *   Converts each integer argument into its 32‑bit two’s‑complement binary form.
+ *
+ * Usage:
+ *   ./bitconv <integer1> [integer2 ...]
+ */
+
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
+ int main(int argc, char *argv[]) {
+ 
+   /* check for at least one integer argument */
+   if (argc < 2) {
+     fprintf(stderr, "Usage: %s <integer> [<integer> ...]\n", argv[0]);
+     return EXIT_FAILURE;
+   }
+ 
+   int num_values = argc - 1;
+ 
+   /* allocate array of pointers for binary strings */
+   char **binary_strings = malloc(num_values * sizeof(char *));
+   if (binary_strings == NULL) {
+     perror("malloc");
+     return EXIT_FAILURE;
+   }
+ 
+ 
+   /* build binary representation for each input */
+   for (int i = 0; i < num_values; i++) {
+     long input_value = strtol(argv[i + 1], NULL, 10);
+ 
+     binary_strings[i] = malloc(33);
+     if (binary_strings[i] == NULL) {
+       perror("malloc");
+       while (i-- > 0) free(binary_strings[i]);
+       free(binary_strings);
+       return EXIT_FAILURE;
+     }
+ 
+     for (int bit_index = 31; bit_index >= 0; bit_index--) {
+       int bit = (input_value >> bit_index) & 1;
+       binary_strings[i][31 - bit_index] = bit ? '1' : '0';
+     }
+     binary_strings[i][32] = '\0';
+   }
+ 
+ 
+   /* output results and free memory */
+   for (int i = 0; i < num_values; i++) {
+     long input_value = strtol(argv[i + 1], NULL, 10);
+     printf("%12ld -> %s\n", input_value, binary_strings[i]);
+     free(binary_strings[i]);
+   }
+ 
+   free(binary_strings);
+   return EXIT_SUCCESS;
+ }
+ 
